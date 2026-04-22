@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 GAME DATABASE - NEON ARCADE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-pink: #ff006e;
+    --neon-cyan: #00f5ff;
+    --neon-green: #39ff14;
+    --neon-yellow: #ffff00;
+    --neon-purple: #bf00ff;
+    --neon-orange: #ff6b00;
+    --bg-dark: #020010;
+    --bg-card: #0a0020;
+    --border-glow: rgba(0,245,255,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-dark);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* FULL SCREEN GIF BACKGROUND */
+  .bg-gif {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .bg-gif img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: brightness(0.20) saturate(1.5);
+  }
+
+  /* Neon color overlay on top of GIF */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(191,0,255,0.20) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,245,255,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 85%, rgba(255,0,110,0.20) 0%, transparent 55%),
+      linear-gradient(180deg, rgba(2,0,16,0.5) 0%, rgba(2,0,16,0.3) 50%, rgba(2,0,16,0.6) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .scanline {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 30px 0 20px;
+    position: relative;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(24px, 5vw, 52px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow), var(--neon-green), var(--neon-cyan));
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow-shift 4s linear infinite, flicker 8s infinite;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(0,245,255,0.5));
+  }
+
+  @keyframes rainbow-shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 1; }
+  }
+
+  .header-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-top: 8px;
+  }
+
+  .header-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-green), transparent);
+    margin: 20px 0;
+    animation: line-glow 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes line-glow {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(2) drop-shadow(0 0 8px var(--neon-cyan)); }
+  }
+
+
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .stat-chip {
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .stat-chip.cyan { border: 1px solid var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,255,0.08); box-shadow: 0 0 10px rgba(0,245,255,0.2); }
+  .stat-chip.pink { border: 1px solid var(--neon-pink); color: var(--neon-pink); background: rgba(255,0,110,0.08); box-shadow: 0 0 10px rgba(255,0,110,0.2); }
+  .stat-chip.green { border: 1px solid var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.08); box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title.cyan { color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); }
+  .panel-title.pink { color: var(--neon-pink); text-shadow: 0 0 15px var(--neon-pink); }
+  .panel-title.green { color: var(--neon-green); text-shadow: 0 0 15px var(--neon-green); }
+  .panel-title.yellow { color: var(--neon-yellow); text-shadow: 0 0 15px var(--neon-yellow); }
+
+  /* FORM */
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .form-input:focus, .form-select:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0,245,255,0.25), inset 0 0 10px rgba(0,245,255,0.05);
+    background: rgba(0,245,255,0.06);
+  }
+
+  .form-input::placeholder { color: rgba(255,255,255,0.25); }
+
+  .form-select option {
+    background: #0a0020;
+    color: #fff;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover::after { opacity: 1; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(0,245,255,0.5);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, rgba(255,0,110,0.2), rgba(255,0,110,0.1));
+    color: var(--neon-pink);
+    border: 1px solid var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255,0,110,0.2);
+    margin-top: 8px;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, rgba(255,0,110,0.35), rgba(255,0,110,0.2));
+    box-shadow: 0 0 25px rgba(255,0,110,0.4);
+  }
+
+  /* SEARCH */
+  .search-box {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--neon-cyan);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    background: rgba(0,245,255,0.06);
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 8px;
+    padding: 11px 14px 11px 42px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .search-input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  }
+
+  .search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .filter-tab {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+    background: transparent;
+    transition: all 0.3s;
+  }
+
+  .filter-tab:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+  }
+
+  .filter-tab.active {
+    background: rgba(0,245,255,0.12);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0,245,255,0.25);
+  }
+
+  /* GAME CARDS LIST */
+  .games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .games-list::-webkit-scrollbar { width: 4px; }
+  .games-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+  .games-list::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
+
+  .game-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 3px solid;
+    position: relative;
+    transition: all 0.3s;
+    animation: card-in 0.4s ease-out;
+    cursor: default;
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .game-card:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateX(4px);
+  }
+
+  .game-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .game-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .provider-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .game-betting {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .bet-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .bet-val {
+    font-weight: 700;
+  }
+
+  .bet-min { color: var(--neon-green); }
+  .bet-max { color: var(--neon-pink); }
+
+  .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,0,110,0.15);
+    border: 1px solid rgba(255,0,110,0.3);
+    color: var(--neon-pink);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.25s;
+    opacity: 0;
+    z-index: 5;
+  }
+
+  .game-card:hover .delete-btn {
+    opacity: 1;
+  }
+
+  .delete-btn:hover {
+    background: rgba(255,0,110,0.4);
+    box-shadow: 0 0 15px rgba(255,0,110,0.5);
+    transform: scale(1.1);
+  }
+
+  /* PROVIDER COLORS */
+  .p0 { border-color: #ff006e; }
+  .p0 .game-name { color: #ff006e; }
+  .p0 .provider-badge { background: rgba(255,0,110,0.15); color: #ff006e; border: 1px solid rgba(255,0,110,0.3); }
+
+  .p1 { border-color: #00f5ff; }
+  .p1 .game-name { color: #00f5ff; }
+  .p1 .provider-badge { background: rgba(0,245,255,0.15); color: #00f5ff; border: 1px solid rgba(0,245,255,0.3); }
+
+  .p2 { border-color: #39ff14; }
+  .p2 .game-name { color: #39ff14; }
+  .p2 .provider-badge { background: rgba(57,255,20,0.15); color: #39ff14; border: 1px solid rgba(57,255,20,0.3); }
+
+  .p3 { border-color: #ffff00; }
+  .p3 .game-name { color: #ffff00; }
+  .p3 .provider-badge { background: rgba(255,255,0,0.15); color: #ffff00; border: 1px solid rgba(255,255,0,0.3); }
+
+  .p4 { border-color: #bf00ff; }
+  .p4 .game-name { color: #bf00ff; }
+  .p4 .provider-badge { background: rgba(191,0,255,0.15); color: #bf00ff; border: 1px solid rgba(191,0,255,0.3); }
+
+  .p5 { border-color: #ff6b00; }
+  .p5 .game-name { color: #ff6b00; }
+  .p5 .provider-badge { background: rgba(255,107,0,0.15); color: #ff6b00; border: 1px solid rgba(255,107,0,0.3); }
+
+  .p6 { border-color: #ff69b4; }
+  .p6 .game-name { color: #ff69b4; }
+  .p6 .provider-badge { background: rgba(255,105,180,0.15); color: #ff69b4; border: 1px solid rgba(255,105,180,0.3); }
+
+  .p7 { border-color: #7fff00; }
+  .p7 .game-name { color: #7fff00; }
+  .p7 .provider-badge { background: rgba(127,255,0,0.15); color: #7fff00; border: 1px solid rgba(127,255,0,0.3); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .empty-state-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+    filter: grayscale(1);
+  }
+
+  .empty-state p {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* NOTIFICATION */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    z-index: 9999;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .notification.show { transform: translateX(0); }
+
+  .notification.success {
+    background: rgba(57,255,20,0.15);
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    box-shadow: 0 0 25px rgba(57,255,20,0.3);
+  }
+
+  .notification.error {
+    background: rgba(255,0,110,0.15);
+    border: 1px solid var(--neon-pink);
+    color: var(--neon-pink);
+    box-shadow: 0 0 25px rgba(255,0,110,0.3);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 30px;
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255,0,110,0.3);
+    box-shadow: 0 0 40px rgba(255,0,110,0.2);
+  }
+
+  .modal-overlay.show .modal { transform: scale(1); }
+
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    color: var(--neon-pink);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 15px var(--neon-pink);
+  }
+
+  .modal-text {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+
+  .modal-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-btns .btn {
+    flex: 1;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, rgba(255,0,110,0.3), rgba(255,0,110,0.15));
+    color: var(--neon-pink);
+    border: 1px solid var(--neon-pink);
+    box-shadow: 0 0 15px rgba(255,0,110,0.3);
+  }
+
+  .btn-danger:hover {
+    box-shadow: 0 0 30px rgba(255,0,110,0.5);
+    transform: translateY(-2px);
+  }
+
+  .btn-cancel {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .btn-cancel:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+
+  /* RESULT COUNT */
+  .result-count {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .result-count span { color: var(--neon-cyan); font-weight: 700; }
+
+  /* PULSE DOT */
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-green);
+    display: inline-block;
+    box-shadow: 0 0 8px var(--neon-green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  /* CORNER DECORATIONS */
+  .corner-tl, .corner-br {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+  .corner-tl { top: 8px; left: 8px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
+  .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+
+  /* GAME COUNT NUMBER */
+  .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: rgba(0,245,255,0.15);
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+    border: 1px solid rgba(0,245,255,0.3);
+  }
+
+  /* RIGHT PANEL HEADER */
+  .right-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- FULL SCREEN GIF BACKGROUND -->
+<div class="bg-gif">
+  <img src="https://giffiles.alphacoders.com/219/219054.gif" alt="Mikey Background">
+</div>
+
+<div class="scanline"></div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification"></div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+    <div class="modal-title">⚠ KONFIRMASI HAPUS</div>
+    <div class="modal-text" id="deleteModalText">Apakah kamu yakin ingin menghapus game ini dari database?</div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeDeleteModal()">BATAL</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">HAPUS</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">🎮 GAME DATABASE</div>
+    <div class="header-subtitle"><span class="pulse-dot"></span> &nbsp; NEON ARCADE SYSTEM &nbsp; <span class="pulse-dot"></span></div>
+    <div class="header-line"></div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-chip cyan" id="statTotal">📊 TOTAL: 0 GAME</div>
+    <div class="stat-chip pink" id="statProvider">🏢 PROVIDER: 0</div>
+    <div class="stat-chip green" id="statFiltered">🔍 DITAMPILKAN: 0</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: ADD FORM -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+
+      <div class="panel-title cyan">⚡ TAMBAH GAME BARU</div>
+
+      <div class="form-group">
+        <label class="form-label">🏢 Nama Provider</label>
+        <input type="text" id="inputProvider" class="form-input" placeholder="Contoh: PG SOFT, PRAGMATIC...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🎮 Nama Permainan</label>
+        <input type="text" id="inputGame" class="form-input" placeholder="Contoh: Mahjong Ways 2...">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">💚 Min Bet (Rp)</label>
+          <input type="number" id="inputMinBet" class="form-input" placeholder="400">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🔴 Max Bet (Rp)</label>
+          <input type="number" id="inputMaxBet" class="form-input" placeholder="5000000">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="addGame()">⚡ SIMPAN KE DATABASE</button>
+      <button class="btn btn-secondary" onclick="clearForm()">↺ RESET FORM</button>
+
+      <!-- PROVIDER QUICK SEARCH -->
+      <div style="margin-top: 28px;">
+        <div class="panel-title yellow">🔍 CARI PER PROVIDER</div>
+        <div class="search-box">
+          <span class="search-icon">🏢</span>
+          <input type="text" class="search-input" id="providerSearch" placeholder="Ketik nama provider..." oninput="filterByProvider()">
+        </div>
+        <div id="providerResults" style="display:none;">
+          <div class="result-count" id="providerResultCount"></div>
+          <div id="providerGamesList" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: GAME LIST -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+
+      <div class="right-header">
+        <div class="panel-title green" style="margin-bottom:0;">
+          🗄 DATABASE GAME
+          <span class="count-badge" id="totalCountBadge">0</span>
+        </div>
+      </div>
+
+      <!-- Search all -->
+      <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input type="text" class="search-input" id="globalSearch" placeholder="Cari provider atau nama game..." oninput="renderGames()">
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" onclick="setFilter('ALL', this)">ALL</button>
+      </div>
+
+      <div class="result-count" id="resultCount"></div>
+
+      <!-- Games list -->
+      <div class="games-list" id="gamesList">
+        <div class="empty-state">
+          <span class="empty-state-icon">🎮</span>
+          <p>Database masih kosong</p>
+          <p style="font-size:11px; margin-top:8px; opacity:0.5;">Tambahkan game pertama kamu!</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ============ DATABASE (localStorage) ============
+const DB_KEY = 'neon_game_db';
+
+function loadDB() {
+  try {
+    return JSON.parse(localStorage.getItem(DB_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDB(data) {
+  localStorage.setItem(DB_KEY, JSON.stringify(data));
+}
+
+let games = loadDB();
+let currentFilter = 'ALL';
+let deleteTargetId = null;
+
+// ============ PROVIDER COLOR MAP ============
+const providerColorIndex = {};
+let colorCounter = 0;
+
+function getProviderColor(provider) {
+  const key = provider.trim().toUpperCase();
+  if (providerColorIndex[key] === undefined) {
+    providerColorIndex[key] = colorCounter % 8;
+    colorCounter++;
+  }
+  return providerColorIndex[key];
+}
+
+// Build color index from existing data
+function rebuildColorIndex() {
+  colorCounter = 0;
+  const seen = new Set();
+  games.forEach(g => {
+    const key = g.provider.trim().toUpperCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      if (providerColorIndex[key] === undefined) {
+        providerColorIndex[key] = colorCounter % 8;
+        colorCounter++;
+      }
+    }
+  });
+}
+
+// ============ FORMAT CURRENCY ============
+function formatRp(num) {
+  const n = parseInt(num);
+  if (isNaN(n)) return 'Rp -';
+  if (n >= 1000000) return `Rp ${(n/1000000).toFixed(n%1000000===0?0:1)}jt`;
+  if (n >= 1000) return `Rp ${(n/1000).toFixed(0)}rb`;
+  return `Rp ${n.toLocaleString('id-ID')}`;
+}
+
+// ============ ADD GAME ============
+function addGame() {
+  const provider = document.getElementById('inputProvider').value.trim();
+  const gameName = document.getElementById('inputGame').value.trim();
+  const minBet = parseInt(document.getElementById('inputMinBet').value);
+  const maxBet = parseInt(document.getElementById('inputMaxBet').value);
+
+  if (!provider) { showNotif('⚠ Nama Provider wajib diisi!', 'error'); return; }
+  if (!gameName) { showNotif('⚠ Nama Permainan wajib diisi!', 'error'); return; }
+  if (!minBet || minBet <= 0) { showNotif('⚠ Min Bet harus diisi!', 'error'); return; }
+  if (!maxBet || maxBet <= 0) { showNotif('⚠ Max Bet harus diisi!', 'error'); return; }
+  if (minBet >= maxBet) { showNotif('⚠ Min Bet harus lebih kecil dari Max Bet!', 'error'); return; }
+
+  // Check duplicate
+  const isDuplicate = games.some(g =>
+    g.provider.toLowerCase() === provider.toLowerCase() &&
+    g.gameName.toLowerCase() === gameName.toLowerCase()
+  );
+  if (isDuplicate) { showNotif('⚠ Game ini sudah ada di database!', 'error'); return; }
+
+  const newGame = {
+    id: Date.now().toString(),
+    provider,
+    gameName,
+    minBet,
+    maxBet,
+    createdAt: new Date().toISOString()
+  };
+
+  games.push(newGame);
+  saveDB(games);
+  rebuildColorIndex();
+  clearForm();
+  renderGames();
+  updateStats();
+  buildFilterTabs();
+  showNotif('✅ Game berhasil disimpan!', 'success');
+}
+
+function clearForm() {
+  document.getElementById('inputProvider').value = '';
+  document.getElementById('inputGame').value = '';
+  document.getElementById('inputMinBet').value = '';
+  document.getElementById('inputMaxBet').value = '';
+  document.getElementById('inputProvider').focus();
+}
+
+// ============ DELETE ============
+function openDeleteModal(id) {
+  const game = games.find(g => g.id === id);
+  if (!game) return;
+  deleteTargetId = id;
+  document.getElementById('deleteModalText').textContent =
+    `Hapus "${game.gameName}" dari provider "${game.provider}"?`;
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+function closeDeleteModal() {
+  deleteTargetId = null;
+  document.getElementById('deleteModal').classList.remove('show');
+}
+
+function confirmDelete() {
+  if (!deleteTargetId) return;
+  games = games.filter(g => g.id !== deleteTargetId);
+  saveDB(games);
+  closeDeleteModal();
+  renderGames();
+  updateStats();
+  buildFilterTabs();
+  filterByProvider();
+  showNotif('🗑 Game dihapus dari database.', 'error');
+}
+
+// ============ FILTER ============
+function setFilter(provider, el) {
+  currentFilter = provider;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderGames();
+}
+
+function buildFilterTabs() {
+  const providers = [...new Set(games.map(g => g.provider.trim().toUpperCase()))].sort();
+  const container = document.getElementById('filterTabs');
+
+  let html = `<button class="filter-tab ${currentFilter === 'ALL' ? 'active' : ''}" onclick="setFilter('ALL', this)">ALL</button>`;
+
+  providers.forEach(p => {
+    const active = currentFilter === p.toUpperCase() ? 'active' : '';
+    html += `<button class="filter-tab ${active}" onclick="setFilter('${p}', this)">${p}</button>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ============ RENDER GAMES ============
+function renderGames() {
+  const search = (document.getElementById('globalSearch').value || '').toLowerCase();
+  let filtered = games.filter(g => {
+    const matchFilter = currentFilter === 'ALL' || g.provider.trim().toUpperCase() === currentFilter;
+    const matchSearch = !search ||
+      g.provider.toLowerCase().includes(search) ||
+      g.gameName.toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+
+  // Sort by provider, then game name
+  filtered.sort((a, b) => a.provider.localeCompare(b.provider) || a.gameName.localeCompare(b.gameName));
+
+  const container = document.getElementById('gamesList');
+  const countEl = document.getElementById('resultCount');
+
+  document.getElementById('totalCountBadge').textContent = games.length;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">${games.length === 0 ? '🎮' : '🔍'}</span>
+        <p>${games.length === 0 ? 'Database masih kosong' : 'Tidak ada hasil ditemukan'}</p>
+        <p style="font-size:11px; margin-top:8px; opacity:0.5;">${games.length === 0 ? 'Tambahkan game pertama kamu!' : 'Coba kata kunci lain'}</p>
+      </div>`;
+    countEl.innerHTML = '';
+    return;
+  }
+
+  countEl.innerHTML = `Menampilkan <span>${filtered.length}</span> dari <span>${games.length}</span> game`;
+
+  container.innerHTML = filtered.map(g => {
+    const colorClass = 'p' + getProviderColor(g.provider);
+    return `
+      <div class="game-card ${colorClass}" id="card-${g.id}">
+        <div class="game-card-header">
+          <div class="game-name">${escapeHtml(g.gameName)}</div>
+          <div class="provider-badge">${escapeHtml(g.provider)}</div>
+        </div>
+        <div class="game-betting">
+          <div class="bet-info">
+            <span>💚 MIN:</span>
+            <span class="bet-val bet-min">${formatRp(g.minBet)}</span>
+          </div>
+          <div class="bet-info">
+            <span>🔴 MAX:</span>
+            <span class="bet-val bet-max">${formatRp(g.maxBet)}</span>
+          </div>
+        </div>
+        <button class="delete-btn" onclick="openDeleteModal('${g.id}')" title="Hapus">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+// ============ PROVIDER QUICK SEARCH ============
+function filterByProvider() {
+  const query = document.getElementById('providerSearch').value.trim().toLowerCase();
+  const resultsDiv = document.getElementById('providerResults');
+  const listDiv = document.getElementById('providerGamesList');
+  const countDiv = document.getElementById('providerResultCount');
+
+  if (!query) {
+    resultsDiv.style.display = 'none';
+    return;
+  }
+
+  const matches = games.filter(g => g.provider.toLowerCase().includes(query));
+  matches.sort((a, b) => a.provider.localeCompare(b.provider) || a.gameName.localeCompare(b.gameName));
+
+  resultsDiv.style.display = 'block';
+
+  if (matches.length === 0) {
+    countDiv.innerHTML = `Ditemukan <span>0</span> game`;
+    listDiv.innerHTML = `<div class="empty-state" style="padding:20px;"><p style="font-size:12px;">Tidak ada game dari provider ini</p></div>`;
+    return;
+  }
+
+  // Group by provider
+  const grouped = {};
+  matches.forEach(g => {
+    const key = g.provider.trim().toUpperCase();
+    if (!grouped[key]) grouped[key] = { name: g.provider, games: [] };
+    grouped[key].games.push(g);
+  });
+
+  countDiv.innerHTML = `Ditemukan <span>${matches.length}</span> game`;
+
+  let html = '';
+  Object.values(grouped).forEach(group => {
+    const colorClass = 'p' + getProviderColor(group.name);
+    html += `<div style="margin-bottom:12px;">`;
+    html += `<div style="font-family:'Orbitron',monospace; font-size:10px; letter-spacing:2px; color:var(--neon-yellow); margin-bottom:6px; text-transform:uppercase;">${escapeHtml(group.name)} (${group.games.length})</div>`;
+    group.games.forEach(g => {
+      html += `
+        <div class="game-card ${colorClass}" style="margin-bottom:6px; padding:10px 14px;">
+          <div class="game-name" style="font-size:12px; margin-bottom:4px;">${escapeHtml(g.gameName)}</div>
+          <div class="game-betting" style="font-size:11px;">
+            <span class="bet-val bet-min">${formatRp(g.minBet)}</span>
+            <span style="color:rgba(255,255,255,0.3)">—</span>
+            <span class="bet-val bet-max">${formatRp(g.maxBet)}</span>
+          </div>
+          <button class="delete-btn" onclick="openDeleteModal('${g.id}')" title="Hapus">🗑</button>
+        </div>`;
+    });
+    html += '</div>';
+  });
+
+  listDiv.innerHTML = html;
+}
+
+// ============ STATS ============
+function updateStats() {
+  const total = games.length;
+  const providers = new Set(games.map(g => g.provider.trim().toUpperCase())).size;
+  const filtered = document.getElementById('gamesList').querySelectorAll('.game-card').length;
+
+  document.getElementById('statTotal').textContent = `📊 TOTAL: ${total} GAME`;
+  document.getElementById('statProvider').textContent = `🏢 PROVIDER: ${providers}`;
+  document.getElementById('statFiltered').textContent = `🔍 DITAMPILKAN: ${filtered}`;
+}
+
+// ============ NOTIFICATION ============
+function showNotif(msg, type) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = `notification ${type} show`;
+  setTimeout(() => {
+    el.classList.remove('show');
+  }, 2800);
+}
+
+// ============ UTILS ============
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ============ INIT ============
+rebuildColorIndex();
+buildFilterTabs();
+renderGames();
+updateStats();
+
+// Re-update stat after render
+setTimeout(updateStats, 100);
+</script>
+</body>
+</html>
