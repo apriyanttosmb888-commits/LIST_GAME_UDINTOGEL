@@ -29,7 +29,6 @@
     position: relative;
   }
 
-  /* FULL SCREEN GIF BACKGROUND */
   .bg-gif {
     position: fixed;
     inset: 0;
@@ -46,7 +45,6 @@
     filter: brightness(0.20) saturate(1.5);
   }
 
-  /* Neon color overlay on top of GIF */
   body::before {
     content: '';
     position: fixed;
@@ -101,7 +99,6 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: rainbow-shift 4s linear infinite, flicker 8s infinite;
-    text-shadow: none;
     filter: drop-shadow(0 0 20px rgba(0,245,255,0.5));
   }
 
@@ -140,7 +137,36 @@
     100% { filter: brightness(2) drop-shadow(0 0 8px var(--neon-cyan)); }
   }
 
+  /* FIREBASE STATUS */
+  .firebase-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
 
+  .fb-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #888;
+    box-shadow: 0 0 8px #888;
+    transition: all 0.5s;
+  }
+
+  .fb-dot.connected { background: var(--neon-green); box-shadow: 0 0 12px var(--neon-green); animation: pulse 2s infinite; }
+  .fb-dot.connecting { background: var(--neon-yellow); box-shadow: 0 0 12px var(--neon-yellow); animation: pulse 0.8s infinite; }
+  .fb-dot.error { background: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
+
+  .fb-label { color: rgba(255,255,255,0.5); }
+  .fb-label.connected { color: var(--neon-green); }
+  .fb-label.connecting { color: var(--neon-yellow); }
+  .fb-label.error { color: var(--neon-pink); }
 
   /* STATS BAR */
   .stats-bar {
@@ -218,9 +244,7 @@
   .panel-title.yellow { color: var(--neon-yellow); text-shadow: 0 0 15px var(--neon-yellow); }
 
   /* FORM */
-  .form-group {
-    margin-bottom: 14px;
-  }
+  .form-group { margin-bottom: 14px; }
 
   .form-label {
     display: block;
@@ -232,7 +256,7 @@
     font-weight: 600;
   }
 
-  .form-input, .form-select {
+  .form-input {
     width: 100%;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(0,245,255,0.2);
@@ -247,18 +271,14 @@
     -webkit-appearance: none;
   }
 
-  .form-input:focus, .form-select:focus {
+  .form-input:focus {
     border-color: var(--neon-cyan);
     box-shadow: 0 0 15px rgba(0,245,255,0.25), inset 0 0 10px rgba(0,245,255,0.05);
     background: rgba(0,245,255,0.06);
   }
 
   .form-input::placeholder { color: rgba(255,255,255,0.25); }
-
-  .form-select option {
-    background: #0a0020;
-    color: #fff;
-  }
+  .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .form-row {
     display: grid;
@@ -283,6 +303,8 @@
     overflow: hidden;
   }
 
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
   .btn::after {
     content: '';
     position: absolute;
@@ -292,7 +314,7 @@
     transition: opacity 0.2s;
   }
 
-  .btn:hover::after { opacity: 1; }
+  .btn:hover:not(:disabled)::after { opacity: 1; }
 
   .btn-primary {
     background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -300,7 +322,7 @@
     box-shadow: 0 0 20px rgba(0,245,255,0.3);
   }
 
-  .btn-primary:hover {
+  .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 0 35px rgba(0,245,255,0.5);
   }
@@ -313,7 +335,7 @@
     margin-top: 8px;
   }
 
-  .btn-secondary:hover {
+  .btn-secondary:hover:not(:disabled) {
     background: linear-gradient(135deg, rgba(255,0,110,0.35), rgba(255,0,110,0.2));
     box-shadow: 0 0 25px rgba(255,0,110,0.4);
   }
@@ -378,10 +400,7 @@
     transition: all 0.3s;
   }
 
-  .filter-tab:hover {
-    border-color: var(--neon-cyan);
-    color: var(--neon-cyan);
-  }
+  .filter-tab:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
   .filter-tab.active {
     background: rgba(0,245,255,0.12);
@@ -420,10 +439,7 @@
     to { opacity: 1; transform: translateX(0); }
   }
 
-  .game-card:hover {
-    background: rgba(255,255,255,0.06);
-    transform: translateX(4px);
-  }
+  .game-card:hover { background: rgba(255,255,255,0.06); transform: translateX(4px); }
 
   .game-card-header {
     display: flex;
@@ -448,24 +464,10 @@
     text-transform: uppercase;
   }
 
-  .game-betting {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    font-weight: 600;
-  }
+  .game-betting { display: flex; gap: 14px; font-size: 12px; font-weight: 600; }
 
-  .bet-info {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: rgba(255,255,255,0.6);
-  }
-
-  .bet-val {
-    font-weight: 700;
-  }
-
+  .bet-info { display: flex; align-items: center; gap: 5px; color: rgba(255,255,255,0.6); }
+  .bet-val { font-weight: 700; }
   .bet-min { color: var(--neon-green); }
   .bet-max { color: var(--neon-pink); }
 
@@ -489,9 +491,7 @@
     z-index: 5;
   }
 
-  .game-card:hover .delete-btn {
-    opacity: 1;
-  }
+  .game-card:hover .delete-btn { opacity: 1; }
 
   .delete-btn:hover {
     background: rgba(255,0,110,0.4);
@@ -539,18 +539,24 @@
     color: rgba(255,255,255,0.2);
   }
 
-  .empty-state-icon {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 12px;
-    filter: grayscale(1);
+  .empty-state-icon { font-size: 48px; display: block; margin-bottom: 12px; filter: grayscale(1); }
+  .empty-state p { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* LOADING STATE */
+  .loading-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--neon-cyan);
   }
 
-  .empty-state p {
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+  .loading-spinner {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 12px;
+    animation: spin 1s linear infinite;
   }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* NOTIFICATION */
   .notification {
@@ -599,10 +605,7 @@
     transition: opacity 0.3s;
   }
 
-  .modal-overlay.show {
-    opacity: 1;
-    pointer-events: all;
-  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
 
   .modal {
     background: var(--bg-card);
@@ -628,21 +631,10 @@
     text-shadow: 0 0 15px var(--neon-pink);
   }
 
-  .modal-text {
-    color: rgba(255,255,255,0.7);
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 22px;
-  }
+  .modal-text { color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6; margin-bottom: 22px; }
 
-  .modal-btns {
-    display: flex;
-    gap: 10px;
-  }
-
-  .modal-btns .btn {
-    flex: 1;
-  }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns .btn { flex: 1; }
 
   .btn-danger {
     background: linear-gradient(135deg, rgba(255,0,110,0.3), rgba(255,0,110,0.15));
@@ -651,10 +643,7 @@
     box-shadow: 0 0 15px rgba(255,0,110,0.3);
   }
 
-  .btn-danger:hover {
-    box-shadow: 0 0 30px rgba(255,0,110,0.5);
-    transform: translateY(-2px);
-  }
+  .btn-danger:hover:not(:disabled) { box-shadow: 0 0 30px rgba(255,0,110,0.5); transform: translateY(-2px); }
 
   .btn-cancel {
     background: rgba(255,255,255,0.05);
@@ -662,23 +651,11 @@
     border: 1px solid rgba(255,255,255,0.15);
   }
 
-  .btn-cancel:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-  }
+  .btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-  /* RESULT COUNT */
-  .result-count {
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-  }
-
+  .result-count { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
   .result-count span { color: var(--neon-cyan); font-weight: 700; }
 
-  /* PULSE DOT */
   .pulse-dot {
     width: 8px;
     height: 8px;
@@ -694,17 +671,10 @@
     50% { transform: scale(1.5); opacity: 0.5; }
   }
 
-  /* CORNER DECORATIONS */
-  .corner-tl, .corner-br {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-  }
+  .corner-tl, .corner-br { position: absolute; width: 20px; height: 20px; pointer-events: none; }
   .corner-tl { top: 8px; left: 8px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
   .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
 
-  /* GAME COUNT NUMBER */
   .count-badge {
     display: inline-flex;
     align-items: center;
@@ -722,7 +692,6 @@
     border: 1px solid rgba(0,245,255,0.3);
   }
 
-  /* RIGHT PANEL HEADER */
   .right-header {
     display: flex;
     align-items: center;
@@ -731,6 +700,38 @@
     flex-wrap: wrap;
     gap: 10px;
   }
+
+  /* SETUP PANEL */
+  .setup-panel {
+    background: rgba(255, 165, 0, 0.08);
+    border: 1px solid rgba(255, 165, 0, 0.4);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .setup-panel .setup-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: #ffaa00;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px #ffaa00;
+  }
+
+  .setup-panel code {
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: var(--neon-cyan);
+    font-size: 12px;
+  }
+
+  .setup-panel a { color: var(--neon-cyan); }
 </style>
 </head>
 <body>
@@ -754,7 +755,7 @@
     <div class="modal-text" id="deleteModalText">Apakah kamu yakin ingin menghapus game ini dari database?</div>
     <div class="modal-btns">
       <button class="btn btn-cancel" onclick="closeDeleteModal()">BATAL</button>
-      <button class="btn btn-danger" onclick="confirmDelete()">HAPUS</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">HAPUS</button>
     </div>
   </div>
 </div>
@@ -766,6 +767,26 @@
     <div class="header-title">🎮 GAME DATABASE</div>
     <div class="header-subtitle"><span class="pulse-dot"></span> &nbsp; NEON ARCADE SYSTEM &nbsp; <span class="pulse-dot"></span></div>
     <div class="header-line"></div>
+  </div>
+
+  <!-- FIREBASE STATUS -->
+  <div class="firebase-status">
+    <div class="fb-dot connecting" id="fbDot"></div>
+    <span class="fb-label connecting" id="fbLabel">MENGHUBUNGKAN KE FIREBASE...</span>
+  </div>
+
+  <!-- SETUP NOTICE (hidden by default, shown if not configured) -->
+  <div class="setup-panel" id="setupPanel" style="display:none;">
+    <div class="setup-title">🔧 KONFIGURASI FIREBASE DIPERLUKAN</div>
+    <p>Ikuti langkah berikut untuk menghubungkan Firebase:</p>
+    <ol style="margin: 10px 0 0 16px;">
+      <li>Buka <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+      <li>Buat project baru → aktifkan <strong>Firestore Database</strong></li>
+      <li>Di <strong>Rules</strong> Firestore, set: <code>allow read, write: if true;</code></li>
+      <li>Pergi ke <strong>Project Settings → Web App</strong> → copy config</li>
+      <li>Ganti nilai <code>FIREBASE_CONFIG</code> di bawah dengan config kamu</li>
+      <li>Upload ulang file ini ke GitHub Pages</li>
+    </ol>
   </div>
 
   <!-- STATS BAR -->
@@ -806,7 +827,7 @@
         </div>
       </div>
 
-      <button class="btn btn-primary" onclick="addGame()">⚡ SIMPAN KE DATABASE</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="addGame()">⚡ SIMPAN KE DATABASE</button>
       <button class="btn btn-secondary" onclick="clearForm()">↺ RESET FORM</button>
 
       <!-- PROVIDER QUICK SEARCH -->
@@ -835,25 +856,21 @@
         </div>
       </div>
 
-      <!-- Search all -->
       <div class="search-box">
         <span class="search-icon">🔎</span>
         <input type="text" class="search-input" id="globalSearch" placeholder="Cari provider atau nama game..." oninput="renderGames()">
       </div>
 
-      <!-- Filter tabs -->
       <div class="filter-tabs" id="filterTabs">
         <button class="filter-tab active" onclick="setFilter('ALL', this)">ALL</button>
       </div>
 
       <div class="result-count" id="resultCount"></div>
 
-      <!-- Games list -->
       <div class="games-list" id="gamesList">
-        <div class="empty-state">
-          <span class="empty-state-icon">🎮</span>
-          <p>Database masih kosong</p>
-          <p style="font-size:11px; margin-top:8px; opacity:0.5;">Tambahkan game pertama kamu!</p>
+        <div class="loading-state">
+          <span class="loading-spinner">⟳</span>
+          <p style="font-size:12px; letter-spacing:2px; text-transform:uppercase;">Memuat dari Firebase...</p>
         </div>
       </div>
     </div>
@@ -862,23 +879,134 @@
 
 </div>
 
-<script>
-// ============ DATABASE (localStorage) ============
-const DB_KEY = 'neon_game_db';
+<!-- ==========================================
+     🔥 FIREBASE SDK
+     ========================================== -->
+<script type="module">
+  // ============================================================
+  // 🔧 GANTI BAGIAN INI DENGAN CONFIG FIREBASE KAMU
+  // Cara dapat config:
+  // 1. Buka https://console.firebase.google.com
+  // 2. Buat / pilih project
+  // 3. Project Settings → Your apps → Web app → Config
+  // ============================================================
+  const FIREBASE_CONFIG = {
+    apiKey: "GANTI_DENGAN_API_KEY_KAMU",
+    authDomain: "GANTI.firebaseapp.com",
+    projectId: "GANTI_DENGAN_PROJECT_ID_KAMU",
+    storageBucket: "GANTI.appspot.com",
+    messagingSenderId: "GANTI",
+    appId: "GANTI"
+  };
+  // ============================================================
 
-function loadDB() {
-  try {
-    return JSON.parse(localStorage.getItem(DB_KEY)) || [];
-  } catch {
-    return [];
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // Cek apakah config sudah diisi
+  const isConfigured = FIREBASE_CONFIG.apiKey !== "GANTI_DENGAN_API_KEY_KAMU";
+
+  if (!isConfigured) {
+    // Belum dikonfigurasi — tampilkan panduan setup
+    setFbStatus('error', '⚠ FIREBASE BELUM DIKONFIGURASI');
+    document.getElementById('setupPanel').style.display = 'block';
+    document.getElementById('gamesList').innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">🔧</span>
+        <p>Ikuti panduan setup di atas</p>
+      </div>`;
+    disableForm(true);
+    window.__fbReady = false;
+  } else {
+    try {
+      const app = initializeApp(FIREBASE_CONFIG);
+      const db = getFirestore(app);
+      const gamesCol = collection(db, 'games');
+
+      setFbStatus('connecting', 'MENGHUBUNGKAN...');
+
+      // Real-time listener — data selalu sinkron otomatis
+      const q = query(gamesCol, orderBy('createdAt', 'asc'));
+      onSnapshot(q,
+        (snapshot) => {
+          setFbStatus('connected', '🔥 FIREBASE TERHUBUNG — DATA REAL-TIME');
+          disableForm(false);
+
+          window.__games = snapshot.docs.map(d => ({
+            id: d.id,
+            ...d.data()
+          }));
+
+          rebuildColorIndex();
+          buildFilterTabs();
+          renderGames();
+          updateStats();
+        },
+        (error) => {
+          console.error('Firestore error:', error);
+          setFbStatus('error', '⚠ KONEKSI GAGAL — CEK ATURAN FIRESTORE');
+          document.getElementById('gamesList').innerHTML = `
+            <div class="empty-state">
+              <span class="empty-state-icon">⚠️</span>
+              <p>Gagal terhubung ke Firebase</p>
+              <p style="font-size:11px; margin-top:8px; opacity:0.5;">Pastikan Rules Firestore sudah diset allow read, write: if true</p>
+            </div>`;
+        }
+      );
+
+      // ADD GAME
+      window.__addGameToFirestore = async (gameData) => {
+        await addDoc(gamesCol, {
+          ...gameData,
+          createdAt: serverTimestamp()
+        });
+      };
+
+      // DELETE GAME
+      window.__deleteGameFromFirestore = async (id) => {
+        await deleteDoc(doc(db, 'games', id));
+      };
+
+      window.__fbReady = true;
+
+    } catch (err) {
+      console.error('Firebase init error:', err);
+      setFbStatus('error', '⚠ FIREBASE GAGAL DIINISIALISASI');
+      disableForm(true);
+    }
   }
-}
 
-function saveDB(data) {
-  localStorage.setItem(DB_KEY, JSON.stringify(data));
-}
+  function setFbStatus(state, label) {
+    const dot = document.getElementById('fbDot');
+    const lbl = document.getElementById('fbLabel');
+    dot.className = `fb-dot ${state}`;
+    lbl.className = `fb-label ${state}`;
+    lbl.textContent = label;
+  }
 
-let games = loadDB();
+  function disableForm(disabled) {
+    ['inputProvider','inputGame','inputMinBet','inputMaxBet','saveBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = disabled;
+    });
+  }
+</script>
+
+<script>
+// ============ LOCAL STATE (populated by Firestore listener) ============
+window.__games = [];
+window.__fbReady = false;
+
 let currentFilter = 'ALL';
 let deleteTargetId = null;
 
@@ -895,11 +1023,10 @@ function getProviderColor(provider) {
   return providerColorIndex[key];
 }
 
-// Build color index from existing data
 function rebuildColorIndex() {
   colorCounter = 0;
   const seen = new Set();
-  games.forEach(g => {
+  (window.__games || []).forEach(g => {
     const key = g.provider.trim().toUpperCase();
     if (!seen.has(key)) {
       seen.add(key);
@@ -921,7 +1048,7 @@ function formatRp(num) {
 }
 
 // ============ ADD GAME ============
-function addGame() {
+async function addGame() {
   const provider = document.getElementById('inputProvider').value.trim();
   const gameName = document.getElementById('inputGame').value.trim();
   const minBet = parseInt(document.getElementById('inputMinBet').value);
@@ -933,30 +1060,27 @@ function addGame() {
   if (!maxBet || maxBet <= 0) { showNotif('⚠ Max Bet harus diisi!', 'error'); return; }
   if (minBet >= maxBet) { showNotif('⚠ Min Bet harus lebih kecil dari Max Bet!', 'error'); return; }
 
-  // Check duplicate
-  const isDuplicate = games.some(g =>
+  const isDuplicate = (window.__games || []).some(g =>
     g.provider.toLowerCase() === provider.toLowerCase() &&
     g.gameName.toLowerCase() === gameName.toLowerCase()
   );
   if (isDuplicate) { showNotif('⚠ Game ini sudah ada di database!', 'error'); return; }
 
-  const newGame = {
-    id: Date.now().toString(),
-    provider,
-    gameName,
-    minBet,
-    maxBet,
-    createdAt: new Date().toISOString()
-  };
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '⏳ MENYIMPAN...';
 
-  games.push(newGame);
-  saveDB(games);
-  rebuildColorIndex();
-  clearForm();
-  renderGames();
-  updateStats();
-  buildFilterTabs();
-  showNotif('✅ Game berhasil disimpan!', 'success');
+  try {
+    await window.__addGameToFirestore({ provider, gameName, minBet, maxBet });
+    clearForm();
+    showNotif('✅ Game berhasil disimpan ke Firebase!', 'success');
+  } catch (err) {
+    console.error(err);
+    showNotif('❌ Gagal menyimpan! Cek koneksi.', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = '⚡ SIMPAN KE DATABASE';
+  }
 }
 
 function clearForm() {
@@ -969,7 +1093,7 @@ function clearForm() {
 
 // ============ DELETE ============
 function openDeleteModal(id) {
-  const game = games.find(g => g.id === id);
+  const game = (window.__games || []).find(g => g.id === id);
   if (!game) return;
   deleteTargetId = id;
   document.getElementById('deleteModalText').textContent =
@@ -982,16 +1106,24 @@ function closeDeleteModal() {
   document.getElementById('deleteModal').classList.remove('show');
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (!deleteTargetId) return;
-  games = games.filter(g => g.id !== deleteTargetId);
-  saveDB(games);
-  closeDeleteModal();
-  renderGames();
-  updateStats();
-  buildFilterTabs();
-  filterByProvider();
-  showNotif('🗑 Game dihapus dari database.', 'error');
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳...';
+
+  try {
+    await window.__deleteGameFromFirestore(deleteTargetId);
+    closeDeleteModal();
+    showNotif('🗑 Game dihapus dari database.', 'error');
+  } catch (err) {
+    console.error(err);
+    showNotif('❌ Gagal menghapus!', 'error');
+    closeDeleteModal();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'HAPUS';
+  }
 }
 
 // ============ FILTER ============
@@ -1003,11 +1135,10 @@ function setFilter(provider, el) {
 }
 
 function buildFilterTabs() {
-  const providers = [...new Set(games.map(g => g.provider.trim().toUpperCase()))].sort();
+  const providers = [...new Set((window.__games || []).map(g => g.provider.trim().toUpperCase()))].sort();
   const container = document.getElementById('filterTabs');
 
   let html = `<button class="filter-tab ${currentFilter === 'ALL' ? 'active' : ''}" onclick="setFilter('ALL', this)">ALL</button>`;
-
   providers.forEach(p => {
     const active = currentFilter === p.toUpperCase() ? 'active' : '';
     html += `<button class="filter-tab ${active}" onclick="setFilter('${p}', this)">${p}</button>`;
@@ -1018,6 +1149,7 @@ function buildFilterTabs() {
 
 // ============ RENDER GAMES ============
 function renderGames() {
+  const games = window.__games || [];
   const search = (document.getElementById('globalSearch').value || '').toLowerCase();
   let filtered = games.filter(g => {
     const matchFilter = currentFilter === 'ALL' || g.provider.trim().toUpperCase() === currentFilter;
@@ -1027,7 +1159,6 @@ function renderGames() {
     return matchFilter && matchSearch;
   });
 
-  // Sort by provider, then game name
   filtered.sort((a, b) => a.provider.localeCompare(b.provider) || a.gameName.localeCompare(b.gameName));
 
   const container = document.getElementById('gamesList');
@@ -1043,6 +1174,7 @@ function renderGames() {
         <p style="font-size:11px; margin-top:8px; opacity:0.5;">${games.length === 0 ? 'Tambahkan game pertama kamu!' : 'Coba kata kunci lain'}</p>
       </div>`;
     countEl.innerHTML = '';
+    updateStats();
     return;
   }
 
@@ -1069,6 +1201,8 @@ function renderGames() {
         <button class="delete-btn" onclick="openDeleteModal('${g.id}')" title="Hapus">🗑</button>
       </div>`;
   }).join('');
+
+  updateStats();
 }
 
 // ============ PROVIDER QUICK SEARCH ============
@@ -1078,11 +1212,9 @@ function filterByProvider() {
   const listDiv = document.getElementById('providerGamesList');
   const countDiv = document.getElementById('providerResultCount');
 
-  if (!query) {
-    resultsDiv.style.display = 'none';
-    return;
-  }
+  if (!query) { resultsDiv.style.display = 'none'; return; }
 
+  const games = window.__games || [];
   const matches = games.filter(g => g.provider.toLowerCase().includes(query));
   matches.sort((a, b) => a.provider.localeCompare(b.provider) || a.gameName.localeCompare(b.gameName));
 
@@ -1094,7 +1226,6 @@ function filterByProvider() {
     return;
   }
 
-  // Group by provider
   const grouped = {};
   matches.forEach(g => {
     const key = g.provider.trim().toUpperCase();
@@ -1129,13 +1260,14 @@ function filterByProvider() {
 
 // ============ STATS ============
 function updateStats() {
+  const games = window.__games || [];
   const total = games.length;
   const providers = new Set(games.map(g => g.provider.trim().toUpperCase())).size;
-  const filtered = document.getElementById('gamesList').querySelectorAll('.game-card').length;
+  const filteredCount = document.getElementById('gamesList').querySelectorAll('.game-card').length;
 
   document.getElementById('statTotal').textContent = `📊 TOTAL: ${total} GAME`;
   document.getElementById('statProvider').textContent = `🏢 PROVIDER: ${providers}`;
-  document.getElementById('statFiltered').textContent = `🔍 DITAMPILKAN: ${filtered}`;
+  document.getElementById('statFiltered').textContent = `🔍 DITAMPILKAN: ${filteredCount}`;
 }
 
 // ============ NOTIFICATION ============
@@ -1143,9 +1275,7 @@ function showNotif(msg, type) {
   const el = document.getElementById('notification');
   el.textContent = msg;
   el.className = `notification ${type} show`;
-  setTimeout(() => {
-    el.classList.remove('show');
-  }, 2800);
+  setTimeout(() => { el.classList.remove('show'); }, 2800);
 }
 
 // ============ UTILS ============
@@ -1156,15 +1286,7 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-
-// ============ INIT ============
-rebuildColorIndex();
-buildFilterTabs();
-renderGames();
-updateStats();
-
-// Re-update stat after render
-setTimeout(updateStats, 100);
 </script>
+
 </body>
 </html>
